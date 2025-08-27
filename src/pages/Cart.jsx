@@ -1,12 +1,28 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import { Link } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { decrementQuantity, incrementQuantity, removeCartItem } from '../redux/slices/cartSlice'
+
 
 const Cart = () => {
+    const userCart=useSelector(state=>state.cartReducer)
+    const dispatch=useDispatch()
+    const [cartTotal,setCartTotal] =useState(0)
+
+    useEffect(()=>{
+        if(userCart?.length>0){
+            setCartTotal(userCart?.map(item=>item?.totalPrice)
+            .reduce((a1,a2)=>a1+a2,0))
+        }
+    },[userCart])
+    
+    
   return (
     <>
     <Header/>
    <div style={{paddingTop:"100px"}} className='0x-5' >
+   {userCart?.length>0 ?
     <>
     <h1 className='text-5xl font-bold text-purple-900'>Cart Summary.....</h1>
     <div className='grid grid-cols-3 gap-4 mt-5'>
@@ -23,20 +39,29 @@ const Cart = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Product Name</td>
-                        <td><img  width={"70px"} height={"70px"}src='https://cdn.fcglcdn.com/brainbees/images/products/zoom/18654790a.webp' alt=''></img></td>
+                   {userCart?.map((product,index)=>(
+                     <tr key={product.id}>
+                        <td>{index+1}</td>
+                        <td>{product?.title}</td>
+                        <td><img  width={"70px"} height={"70px"}src={product?.thumbnail} alt=''></img></td>
                         <td>
                             <div className='flex'>
-                                <button className='font-bold'>-</button>
-                                <input style={{width:"40px"}} type='text' className='border p-1 rounded mx-2' value={12} readOnly></input>
-                                <button className='font-bold'>+</button>
+                                <button onClick={()=>dispatch(decrementQuantity(product))}
+                                 className='font-bold'>-</button>
+                                 
+                                <input style={{width:"40px"}} type='text' className='border p-1 rounded mx-2'
+                                 value={product?.quantity} readOnly></input>
+                                <button onClick={()=>dispatch(incrementQuantity(product?.id))}
+                                 className='font-bold'>+</button>
                             </div>
                         </td>
-                        <td>$ 250</td>
-                        <td><button className='text-red-600'><i className='fa-solid fa-trash'></i></button></td>
+                        <td>{product?.toatalPrice}</td>
+                        <td><button onClick={()=>dispatch(removeCartItem(product?.id))}className='text-red-600'><i className='fa-solid fa-trash'></i></button></td>
                     </tr>
+                   )
+                   )
+
+                   }
                 </tbody>
 
             </table>
@@ -49,7 +74,8 @@ const Cart = () => {
         </div>
         <div className='col-span-1'>
             <div className='border rounded shadow p-5'>
-              <h2 className='text-2xl font-bold '>Total Amount: <span className='text-red-600'>$250</span></h2>
+              <h2 className='text-2xl font-bold '>Total Amount:
+              <span className='text-red-600'>{cartTotal}</span></h2>
               <hr/>
               <button className='bg-green-500 rounded p-2 text-white w-full mt-4'>Check Out</button>
             </div>
@@ -57,7 +83,14 @@ const Cart = () => {
         </div>
 
     </div>
-    </>
+    </> 
+    :
+    <div className='flex justify-center items-center h-screen'>
+            <img src='https://i.pinimg.com/originals/5a/d0/47/5ad047a18772cf0488a908d98942f9bf.gif' alt=''></img>
+            <h1 className='text-3xl text-red-600'>Your cart is empty!!!</h1>
+         </div>
+
+   }
    </div>
    </>
   )
