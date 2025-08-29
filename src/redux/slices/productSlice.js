@@ -14,29 +14,37 @@ export const fetchProducts = createAsyncThunk("products/fetchProducts",
 const productSlice = createSlice({
   name: "products",
   initialState: {
+    dummyAllProducts:[],
     allProducts: [],
     loading:false,
     errorMsg:""
   },
-  redcers: {
-
+   reducers: {
+    searchproduct: (state, action) => {
+      state.allProducts = state.dummyAllProducts.filter(item =>
+        item.title.toLowerCase().includes(action.payload)
+      );
+    }
   },
   extraReducers:(builder)=>{
     builder.addCase(fetchProducts.fulfilled,(state,apiResult)=>
     {
         state.allProducts=apiResult.payload
+        state.dummyAllProducts=apiResult.payload
         state.loading=false
         state.errorMsg=""
     })
     builder.addCase(fetchProducts.pending,(state)=>
     {
         state.allProducts=[]
+        state.dummyAllProducts=[]
         state.loading=true
         state.errorMsg=""
     })
     builder.addCase(fetchProducts.rejected,(state)=>
     {
         state.allProducts=[]
+        state.dummyAllProducts=[]
         state.loading=false
         state.errorMsg=" API call failed"
     })
@@ -45,3 +53,4 @@ const productSlice = createSlice({
 
 
 export default productSlice.reducer
+export const {searchproduct}=productSlice.actions

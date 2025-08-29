@@ -1,8 +1,10 @@
 import React from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { searchproduct } from '../redux/slices/productSlice'
 
 const Header = ({insideHome}) => {
+  const dispatch =useDispatch()
   const userCart = useSelector(state=>state.cartReducer)
   const userWishlist = useSelector(state=>state.wishlistReducer)
   return (
@@ -10,7 +12,8 @@ const Header = ({insideHome}) => {
         <Link  className=' text-2xl font-bold'to={'/'}><i className='fa-solid fa-truck-fast me-1'></i>Daily Cart</Link>
         <ul className='flex-1 text-right'>
            {insideHome &&  
-           <li className='list-none inline-block px-5'><input style={{width:"300px"}} className=" rounded border p-2 " placeholder='search products name'type='text'></input></li>
+           <li className='list-none inline-block px-5'>
+            <input onChange={e=>dispatch(searchproduct(e.target.value.toLowerCase()))} style={{width:"300px"}} className=" rounded border p-2 " placeholder='search products name'type='text'></input></li>
            }
             <li  className='list-none inline-block px-5'><Link to={'/wishlist'}><i className='fa-solid fa-heart text-red-600'></i>Wishlist<span className='bg-black text-white rounded p-1'>{userWishlist?.length}</span></Link></li>
             <li  className='list-none inline-block px-5'>
